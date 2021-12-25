@@ -4,7 +4,7 @@
 #include <sstream>
 #include <regex>
 
-#include "job.cpp"
+#include "job.hpp"
 #include "enums.hpp"
 
 using namespace std;
@@ -91,6 +91,7 @@ void parseCSV(const string filename,
                 // cout << endl;
                 job_current.add_process(Process(stoi(match[2].str()), match[1].str()));
             }
+            job_current.number = out_jobs.size() + 1;
             out_jobs.push_back(job_current);
         }
     }

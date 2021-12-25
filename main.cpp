@@ -3,7 +3,7 @@
 
 #include "csv_parsing.cpp"
 #include "round_robin.cpp"
-#include "job.cpp"
+#include "job.hpp"
 #include "enums.hpp"
 
 using namespace std;

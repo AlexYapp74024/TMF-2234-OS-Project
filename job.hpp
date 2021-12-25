@@ -37,6 +37,7 @@ struct Process
 
 struct Job
 {
+    int number;
     int arrivalTime;
     vector<Process> list;
 
@@ -60,7 +61,7 @@ struct Job
             list.erase(list.begin());
     }
 
-    Process &current()
+    Process &current_process()
     {
         return *(list.begin());
     }
