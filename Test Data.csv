@@ -1,0 +1,6 @@
+,Job (1),1,Job (1) arrive at CPU cycle 1,,,Job (2),7,Job (2) arrive at CPU cycle 7,,,Job (3),100,Job (3) arrive at CPU cycle 100
+1,19,CPU,CPU (19),,1,14,CPU,CPU (14),,1,6,CPU,CPU (6)
+1,11,CPU,CPU (11),,2,10,I/O,I/O (10),,1,7,CPU,CPU (7)
+2,17,I/O,I/O (17),,2,8,I/O,I/O (8),,2,5,I/O,I/O (5)
+1,7,CPU,CPU (7),,1,13,CPU,CPU (13),,2,12,I/O,I/O (12)
+2,15,I/O,I/O (15),,2,19,I/O,I/O (19),,2,10,I/O,I/O (10)

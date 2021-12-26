@@ -34,12 +34,40 @@ struct Process
     }
     void run() { --cycles; };
 };
-
 struct Job
 {
     int number;
     int arrivalTime;
+    int completeTime;
+    int totalCPUburst = 0;
+    int totalIOburst = 0;
     vector<Process> list;
+
+    int turnaround_time()
+    {
+        return completeTime - arrivalTime;
+    }
+
+    int waiting_time()
+    {
+        return turnaround_time() - totalCPUburst - totalIOburst;
+    }
+
+    void calculate_burst()
+    {
+        for (auto i : list)
+        {
+            switch (i.type)
+            {
+            case ProcessType::IO:
+                totalIOburst += i.cycles;
+                break;
+            case ProcessType::CPU:
+                totalCPUburst += i.cycles;
+                break;
+            }
+        }
+    }
 
     int count()
     {

@@ -1,34 +1,37 @@
 #include <iostream>
 #include <vector>
-#include <array>
+#include <algorithm>
 
 #include "job.hpp"
 #include "enums.hpp"
 
 using namespace std;
 
-void round_robin(vector<Job> jobList)
+vector<Job> round_robin(vector<Job> jobList, int &out_interupts, int &out_totalCycles, int timeQuantum = 10)
 {
-    const int TIME_QUANTUM = 10;
+    const bool LOG = false;
     int jobCount = jobList.size();
 
+    vector<Job> newJobs = jobList;
     vector<Job> ready;
     vector<Job> waiting;
     vector<Job> running;
     vector<Job> terminated;
+    int cycle;
+    // Job Processing
 
-    for (int cycle = 0; terminated.size() < jobCount; cycle++)
+    for (cycle = 0; terminated.size() < jobCount; cycle++)
     {
         // Identify new jobs
         // add to ready
-        for (auto it = jobList.begin(); it < jobList.end(); it++)
+        for (auto it = newJobs.begin(); it < newJobs.end(); it++)
         {
             if (cycle >= it->arrivalTime)
             {
-                cout << cycle << " : "
-                     << " Job " << it->number << " has arrived " << endl;
+                if (LOG)
+                    cout << cycle << " : Job " << it->number << " has arrived " << endl;
                 ready.push_back(*it);
-                jobList.erase(it);
+                newJobs.erase(it);
             }
         }
 
@@ -44,8 +47,8 @@ void round_robin(vector<Job> jobList)
             }
             else if (process.type == ProcessType::CPU)
             {
-                cout << cycle << " : "
-                     << " Job " << it->number << " received I/O " << endl;
+                if (LOG)
+                    cout << cycle << " : Job " << it->number << " received I/O " << endl;
                 ready.push_back(*it);
                 waiting.erase(it);
             }
@@ -59,15 +62,15 @@ void round_robin(vector<Job> jobList)
             Process process = it->current_process();
             if (process.type == ProcessType::IO)
             {
-                cout << cycle << " : "
-                     << " Job " << it->number << " wait for I/O " << endl;
+                if (LOG)
+                    cout << cycle << " : Job " << it->number << " wait for I/O " << endl;
                 waiting.push_back(*it);
                 ready.erase(it);
             }
             else if (process.type == ProcessType::CPU && running.empty())
             {
-                cout << cycle << " : "
-                     << " Job " << it->number << " is added to Running" << endl;
+                if (LOG)
+                    cout << cycle << " : Job " << it->number << " is added to Running" << endl;
                 running.push_back(*it);
                 ready.erase(it);
             }
@@ -84,30 +87,31 @@ void round_robin(vector<Job> jobList)
 
             if (process.type == ProcessType::CPU)
             {
-                it->run();
+                if (cyclesUsed >= timeQuantum)
+                {
+                    if (LOG)
+                        cout << cycle << " : Job " << it->number << " preempted (time quantum used up) " << endl;
+                    ++out_interupts;
+                    ready.push_back(*it);
+                    running.erase(it);
+                }
+                else
+                {
+                    it->run();
+                    cyclesUsed++;
+                }
             }
 
             if (process.type == ProcessType::IO)
             {
-                cout << cycle << " : "
-                     << " Job " << it->number << " wait for I/O " << endl;
+                if (LOG)
+                    cout << cycle << " : Job " << it->number << " wait for I/O " << endl;
                 waiting.push_back(*it);
                 running.erase(it);
             }
 
-            if (!running.empty())
-                cyclesUsed++;
-            else
+            if (running.empty())
                 cyclesUsed = 0;
-
-            if (cyclesUsed >= TIME_QUANTUM)
-            {
-                cout << cycle << " : "
-                     << " Job " << it->number << " preempted (time quantum used up) " << endl;
-                ready.push_back(*it);
-                running.erase(it);
-                cyclesUsed = 0;
-            }
         }
         // Terminate empty jobs
 
@@ -118,8 +122,9 @@ void round_robin(vector<Job> jobList)
             {
                 if (it->list.empty())
                 {
-                    cout << cycle << " : "
-                         << " Job " << it->number << " terminated" << endl;
+                    if (LOG)
+                        cout << cycle << " : Job " << it->number << " terminated" << endl;
+                    it->completeTime = cycle;
                     terminated.push_back(*it);
                     vec.erase(it);
                 }
@@ -131,4 +136,9 @@ void round_robin(vector<Job> jobList)
         terminate_job(waiting);
         terminate_job(running);
     }
+
+    out_totalCycles = cycle;
+    sort(terminated.begin(), terminated.end(), [](Job x, Job y)
+         { return x.number < y.number; });
+    return terminated;
 }

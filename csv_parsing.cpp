@@ -9,10 +9,10 @@
 
 using namespace std;
 
-void parseCSV(const string filename,
-              vector<Job> &out_jobs)
+vector<Job> parseCSV(const string filename)
 {
     vector<vector<string>> cells;
+    vector<Job> jobs;
 
     // This section Extracts Data from each cells
     {
@@ -57,21 +57,9 @@ void parseCSV(const string filename,
         int rowCount = cells.size() - 1;
         int colCount = cells.at(0).size();
 
-        // for (int row = 0; row < rowCount; row++)
-        // {
-        //     for (int col = 0; col < colCount; col++)
-        //     {
-        //         cout << cells.at(row).at(col) << " ";
-        //     }
-        //     cout << endl;
-        // }
-
         for (int col = FIRST_COLUMN_NUMBER; col < colCount; col += GAP_BETWEEN_PROCESSES)
         {
             Job job_current;
-
-            // for row 0, extract arrival time
-            // cout << cells.at(0).at(col) << endl;s
 
             smatch match;
             regex_search(cells.at(0).at(col), match, regex("[0-9]{1,}$"));
@@ -84,15 +72,14 @@ void parseCSV(const string filename,
                 // zeroth subgroup matches whole string
                 // first subgroup matches CPU or I/O
                 // second subgroup matches number in bracket
-                // cout << cells.at(row).at(col) << " : ";
                 regex_search(cells.at(row).at(col), match, regex("(CPU|I/O).+\\((\\d{1,})\\)$"));
-                // for (auto pattern : match)
-                //     cout << pattern << " ";
-                // cout << endl;
                 job_current.add_process(Process(stoi(match[2].str()), match[1].str()));
             }
-            job_current.number = out_jobs.size() + 1;
-            out_jobs.push_back(job_current);
+            job_current.number = jobs.size() + 1;
+            job_current.calculate_burst();
+            jobs.push_back(job_current);
         }
     }
+
+    return jobs;
 }
