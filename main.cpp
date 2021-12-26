@@ -7,7 +7,6 @@
 #include "enums.hpp"
 
 using namespace std;
-
 struct Results
 {
     int interupts = 0;
@@ -35,7 +34,6 @@ struct Results
 
 int main()
 {
-    // const string FILENAME = "Job List 11.csv";
     const string FILENAME = "Job List 11 3.csv";
 
     vector<Job> jobList = parseCSV(FILENAME);
@@ -59,6 +57,8 @@ int main()
         printf(TABLE_HEADER_FORMAT, "Time", "Total", "Average", "Average", "Number of");
         printf(TABLE_HEADER_FORMAT, "Quantum", "Cycles", "Turnaround Time", "Waiting Time", "Interupts");
         printf(TABLE_HEADER_FORMAT, DASHES, DASHES, DASHES, DASHES, DASHES);
+
+        // Usage of vectors and Itterators inspired by Bo Qian, 2012.
         for (auto it = results.begin(); it < results.end(); it++)
         {
             printf(TABLE_CONTENT_FORMAT,
@@ -72,6 +72,7 @@ int main()
 
     // Rank results
     {
+        // Usage of min_element function refered from Bo Qian, 2013
         cout << endl;
         vector<Results>::iterator it;
         it = min_element(results.begin(), results.end(),
@@ -100,3 +101,12 @@ int main()
 
     return 0;
 }
+
+// References
+/*
+    Bo Qian. (2012, Dec 28). Introduction of STL #2: Sequence Containers [Video]. Youtube.
+        https://www.youtube.com/watch?v=gxZJ5JNuWMY
+
+    Bo Qian. (2013, Jan 16). STL Algorithms #1: Non-modifying Algorithms [Video]. Youtube.
+        https://www.youtube.com/watch?v=eV7tVdNIw9o
+*/

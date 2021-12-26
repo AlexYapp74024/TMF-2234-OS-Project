@@ -12,26 +12,25 @@ vector<Job> round_robin(vector<Job> jobList, int &out_interupts, int &out_totalC
     const bool LOG = false;
     int jobCount = jobList.size();
 
-    vector<Job> newJobs = jobList;
     vector<Job> ready;
     vector<Job> waiting;
     vector<Job> running;
     vector<Job> terminated;
     int cycle;
-    // Job Processing
 
+    // Job Processing
     for (cycle = 0; terminated.size() < jobCount; cycle++)
     {
         // Identify new jobs
         // add to ready
-        for (auto it = newJobs.begin(); it < newJobs.end(); it++)
+        for (auto it = jobList.begin(); it < jobList.end(); it++)
         {
             if (cycle >= it->arrivalTime)
             {
                 if (LOG)
                     cout << cycle << " : Job " << it->number << " has arrived " << endl;
                 ready.push_back(*it);
-                newJobs.erase(it);
+                jobList.erase(it);
             }
         }
 
@@ -115,6 +114,9 @@ vector<Job> round_robin(vector<Job> jobList, int &out_interupts, int &out_totalC
         }
         // Terminate empty jobs
 
+        // Basics of lambda expressions cover by The Cherno, 2018
+        // Details on lambda expressions are available in cppreference.com, 2021
+
         // lambda function that terminates jobs in given vectors
         auto terminate_job = [&](vector<Job> &vec)
         {
@@ -138,7 +140,21 @@ vector<Job> round_robin(vector<Job> jobList, int &out_interupts, int &out_totalC
     }
 
     out_totalCycles = cycle;
+
+    // Sorting function demonstrated by Bo Qian, 2013
     sort(terminated.begin(), terminated.end(), [](Job x, Job y)
          { return x.number < y.number; });
     return terminated;
 }
+
+// References
+/*
+    Bo Qian. (2013, Jan 16). STL Algorithms #3: Sorting [Video]. Youtube.
+        https://www.youtube.com/watch?v=TZv5qHU2AMQ
+
+    cppreference.com. (2021, Dec 6). Lambda expressions (since C++11).
+        https://en.cppreference.com/w/cpp/language/lambda
+
+    The Cherno. (2018, Feb 11). Lambdas in C++ [Video]. Youtube.
+        https://www.youtube.com/watch?v=mWgmBBz0y8c
+*/
